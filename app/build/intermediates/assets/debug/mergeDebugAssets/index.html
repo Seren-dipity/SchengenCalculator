@@ -1,0 +1,3613 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>申根停留计算器</title>
+    <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+    <link rel="manifest" href="site.webmanifest" />
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+            line-height: 1.6;
+            padding: 12px;
+            font-size: 16px; /* 防止iOS缩放 */
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .card h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1e293b;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: #374151;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px; /* 防止iOS缩放 */
+            transition: border-color 0.2s;
+            min-height: 44px; /* 最小触摸目标 */
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            min-height: 44px; /* 最小触摸目标 */
+            touch-action: manipulation; /* 优化触摸响应 */
+        }
+        
+        button:hover {
+            background: #2563eb;
+        }
+        
+        button.secondary {
+            background: #6b7280;
+        }
+        
+        button.secondary:hover {
+            background: #4b5563;
+        }
+        
+        button.danger {
+            background: #dc2626;
+        }
+        
+        button.danger:hover {
+            background: #b91c1c;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* 默认移动端：更小的minmax阈值 */
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .stat-number.danger {
+            color: #dc2626;
+        }
+
+        .stat-number.warning {
+            color: #d97706;
+        }
+
+        .stat-number.success {
+            color: #059669;
+        }
+
+        .stat-number.primary {
+            color: #1d4ed8;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .table th,
+        .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .table th {
+            font-weight: 600;
+            color: #374151;
+            background: #f9fafb;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+        
+        .date-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        
+        .date-range-display {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .date-range-display span {
+            padding: 4px 8px;
+            background: #f8fafc;
+            border-radius: 4px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* 统计网格样式 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        /* 移动端统计网格 */
+        @media (max-width: 767px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 16px;
+            }
+
+            .stat-icon {
+                font-size: 28px;
+            }
+
+            .stat-number {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* 平板及以上统计网格 */
+        @media (min-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+        }
+
+        /* 统计区域样式 */
+        .stat-section {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .stat-section h3, .stat-section h4, .stat-section h5 {
+            margin-bottom: 16px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .stat-section h3 {
+            font-size: 1.1rem;
+            color: #1e293b;
+        }
+
+        .stat-section h4 {
+            font-size: 1rem;
+            color: #374151;
+        }
+
+        .stat-section h5 {
+            font-size: 0.95rem;
+            color: #6b7280;
+            margin-bottom: 12px;
+        }
+
+        /* 排行榜容器样式 */
+        .ranking-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        /* 平板及以上排行榜容器 */
+        @media (min-width: 768px) {
+            .ranking-container {
+                grid-template-columns: 1fr 1fr;
+                gap: 24px;
+            }
+        }
+
+        .ranking-group {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #f1f5f9;
+        }
+
+        .ranking-group h4, .ranking-group h5 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #6b7280;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 8px;
+        }
+
+        .ranking-group-total {
+            font-size: 0.8rem;
+            color: #9ca3af;
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px solid #f3f4f6;
+            text-align: right;
+            font-weight: 500;
+        }
+
+        .country-ranking-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .country-ranking-item:hover {
+            transform: translateX(2px);
+        }
+
+        .country-ranking-item.rank-1 { border-left-color: #dc2626; }
+        .country-ranking-item.rank-2 { border-left-color: #ea580c; }
+        .country-ranking-item.rank-3 { border-left-color: #d97706; }
+        .country-ranking-item.rank-4 { border-left-color: #ca8a04; }
+        .country-ranking-item.rank-5 { border-left-color: #65a30d; }
+
+        .ranking-country {
+            font-weight: 500;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ranking-number {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .ranking-badge {
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .ranking-non-schengen {
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        /* Flatpickr 自定义样式 */
+        .flatpickr-calendar {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            /* 确保日历显示在模态框之上 */
+            z-index: 3000;
+        }
+
+        .flatpickr-day.selected {
+            background: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        .flatpickr-day.selected:hover {
+            background: #2563eb;
+        }
+
+        .flatpickr-day.inRange {
+            background: #dbeafe;
+            border-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* 平板及以上设备 - 多列布局 */
+        @media (min-width: 768px) {
+            .main-layout {
+                grid-template-columns: 1fr 2fr; /* 平板及桌面：双列 */
+                gap: 20px;
+            }
+
+            .ranking-container {
+                flex-direction: row; /* 平板及桌面：水平排列 */
+                gap: 16px;
+            }
+
+            .stats {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* 平板及桌面：更大的minmax阈值 */
+            }
+        }
+
+        /* 桌面设备优化 */
+        @media (min-width: 1024px) {
+            .stats {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+
+        /* 移动端样式保持不变 */
+        @media (max-width: 767px) {
+            body {
+                padding: 8px;
+                /* 确保移动端不会阻止触摸事件 */
+                touch-action: manipulation;
+            }
+
+            .header {
+                margin-bottom: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .card {
+                padding: 16px;
+                margin-bottom: 12px;
+            }
+
+            .card h2 {
+                font-size: 1.1rem;
+                margin-bottom: 12px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .controls button {
+                width: 100%;
+                margin-bottom: 4px;
+            }
+
+            /* 确保移动端按钮和链接可以被点击 */
+            button, a, .date-range-trigger {
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+                cursor: pointer;
+            }
+
+            /* 确保菜单项在移动端可以被点击 */
+            .main-menu a {
+                min-height: 44px; /* iOS推荐的最小触摸目标 */
+                display: flex;
+                align-items: center;
+                padding: 12px 16px;
+            }
+
+            .date-range-display {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .main-layout {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .country-ranking-item {
+                padding: 8px 12px;
+            }
+
+            .ranking-country {
+                font-size: 0.9rem;
+            }
+
+            .ranking-number {
+                font-size: 0.9rem;
+            }
+
+            .ranking-container {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .ranking-group h4 {
+                font-size: 0.85rem;
+            }
+
+            .ranking-group-total {
+                font-size: 0.75rem;
+            }
+
+            /* 表格在移动端的优化 - 卡片式布局 */
+            .table-container {
+                overflow-x: visible; /* 移动端不使用水平滚动 */
+            }
+
+            .table {
+                font-size: 0.85rem;
+            }
+
+            .table thead {
+                display: none; /* 移动端隐藏表头 */
+            }
+
+            .table tbody {
+                display: block;
+            }
+
+            .table tr {
+                display: block;
+                margin-bottom: 16px;
+                background: #f9fafb;
+                border-radius: 8px;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+                padding: 12px;
+            }
+
+            .table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid #e5e7eb;
+                padding: 8px 0;
+            }
+
+            .table td:last-child {
+                border-bottom: none;
+            }
+
+            /* 使用伪元素添加标签 */
+            .table td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #374151;
+            }
+
+            /* 统计卡片在移动端的优化 */
+            .stats {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* 确保移动端使用单列 */
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 16px;
+            }
+
+            .stat-number {
+                font-size: 1.5rem;
+            }
+
+            .stat-label {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* 底部导航栏移动端优化 */
+        @media (max-width: 767px) {
+            .fab {
+                bottom: 90px; /* 在移动端稍微上移，避免与导航栏重叠 */
+                right: 16px;
+                width: 56px;
+                height: 56px;
+            }
+
+            .fab-icon {
+                font-size: 24px;
+            }
+
+            .bottom-nav {
+                padding: 6px 0;
+            }
+
+            .nav-item {
+                min-height: 50px;
+                padding: 6px 0;
+            }
+
+            .nav-icon {
+                font-size: 18px;
+                margin-bottom: 2px;
+            }
+
+            .nav-label {
+                font-size: 11px;
+            }
+
+            .main-content {
+                padding-bottom: 70px; /* 移动端底部导航更小 */
+            }
+
+            .tab-panel {
+                padding-bottom: 70px;
+            }
+        }
+
+        /* 超小屏幕优化 */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.3rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .stat-card {
+                padding: 12px;
+            }
+
+            .stat-number {
+                font-size: 1.3rem;
+            }
+
+            .controls button {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+
+            .table {
+                font-size: 0.8rem;
+            }
+
+            .table th,
+            .table td {
+                padding: 6px 4px;
+            }
+
+            /* 模态框在超小屏幕上的优化 */
+            .modal-content {
+                margin: 5% auto;
+                width: 95%;
+                max-width: none;
+            }
+
+            .fab {
+                bottom: 80px;
+                right: 12px;
+                width: 52px;
+                height: 52px;
+            }
+
+            .fab-icon {
+                font-size: 22px;
+            }
+        }
+
+        /* 动画和过渡效果 */
+        .card, .stat-card, .country-ranking-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        /* 标签页切换动画 */
+        .tab-panel {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .tab-panel.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 悬浮按钮脉冲动画 */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .fab {
+            animation: pulse 2s infinite;
+        }
+
+        .fab:hover {
+            animation: none;
+        }
+
+        /* 导航项激活动画 */
+        .nav-item.active .nav-icon {
+            animation: bounceIn 0.3s ease;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0.8);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1.1);
+            }
+        }
+
+        /* 模态框动画优化 */
+        .modal {
+            animation: fadeInScale 0.3s ease;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-content {
+            animation: slideInUp 0.3s ease;
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* 触摸优化 */
+        button:active {
+            transform: scale(0.98);
+            transition: transform 0.1s;
+        }
+
+        /* 滚动优化 */
+        * {
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* 防止双击缩放 */
+        input, select, textarea, button {
+            touch-action: manipulation;
+        }
+
+        /* 改进的焦点样式 */
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+
+        /* 记录列表样式 */
+        .records-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .record-item {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #f1f5f9;
+            transition: all 0.3s ease;
+        }
+
+        .record-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .record-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .record-country {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .country-flag {
+            font-size: 1.2rem;
+        }
+
+        .country-name {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .schengen-badge, .non-schengen-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .schengen-badge {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .non-schengen-badge {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .record-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .delete-btn {
+            background: #fee2e2;
+            color: #dc2626;
+            border: none;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .delete-btn:hover {
+            background: #fecaca;
+            transform: scale(1.1);
+        }
+
+        .record-details {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .record-dates {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .date-entry, .date-exit {
+            font-size: 0.9rem;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .date-separator {
+            color: #9ca3af;
+            font-size: 1.2rem;
+        }
+
+        .record-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .days-counted {
+            font-size: 0.85rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .record-notes {
+            font-size: 0.85rem;
+            color: #6b7280;
+            font-style: italic;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        /* 移动端记录列表优化 */
+        @media (max-width: 767px) {
+            .record-item {
+                padding: 16px;
+            }
+
+            .record-header {
+                margin-bottom: 12px;
+            }
+
+            .record-country {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .country-name {
+                font-size: 0.9rem;
+            }
+
+            .record-dates {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .date-separator {
+                display: none;
+            }
+
+            .record-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+            }
+        }
+
+        /* 加载状态样式 */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 加载覆盖层样式 */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(2px);
+        }
+
+        .loading-content {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        .loading-text {
+            color: #6b7280;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .loading-overlay.hidden {
+            display: none;
+        }
+
+        /* 错误状态样式 */
+        .error-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #dc2626;
+        }
+
+        .error-state p {
+            font-size: 16px;
+            margin: 0;
+        }
+
+        /* 优化选择器在移动端的显示 */
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+
+        /* 标签页样式 */
+        .tab-content {
+            min-height: calc(100vh - 160px);
+        }
+
+        .tab-panel {
+            display: none;
+            padding-bottom: 80px; /* 为底部导航留出空间 */
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* 底部导航栏样式 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            padding: 8px 0;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 0;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #6b7280;
+            font-size: 12px;
+            min-height: 56px;
+            touch-action: manipulation;
+        }
+
+        .nav-item.active {
+            color: #3b82f6;
+        }
+
+        .nav-item.active .nav-icon {
+            transform: scale(1.1);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+            transition: transform 0.2s;
+        }
+
+        .nav-label {
+            font-weight: 500;
+        }
+
+        /* 悬浮操作按钮样式 */
+        .fab {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #3b82f6;
+            border: none;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+            cursor: pointer;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            touch-action: manipulation;
+        }
+
+        .fab:hover {
+            background: #2563eb;
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+        }
+
+        .fab:active {
+            transform: scale(0.95);
+        }
+
+        .fab-icon {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        /* 表单操作按钮组样式 */
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .form-actions button {
+            flex: 1;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* 主内容区域样式调整 */
+        .main-content {
+            padding-top: 72px;
+            padding-bottom: 80px; /* 为底部导航留出空间 */
+        }
+
+        /* 控制卡片样式 */
+        .control-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border: 1px solid #cbd5e1;
+        }
+
+        .control-card .date-control {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .control-card label {
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .control-card input[type="date"] {
+            padding: 16px;
+            border-radius: 12px;
+            border: 2px solid #cbd5e1;
+            background: white;
+            font-size: 16px;
+        }
+
+        /* 统计卡片增强样式 */
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #f1f5f9;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-card.primary-card {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+        }
+
+        .stat-card.primary-card .stat-icon {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .stat-card.primary-card .stat-label,
+        .stat-card.primary-card .stat-subtext {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            flex-shrink: 0;
+        }
+
+        .stat-content {
+            flex: 1;
+        }
+
+        .stat-subtext {
+            font-size: 0.8rem;
+            margin-top: 4px;
+            color: #64748b;
+        }
+
+        /* 空状态样式 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-subtitle {
+            font-size: 0.9rem;
+            margin-top: 8px;
+            opacity: 0.7;
+        }
+
+        /* 设置组样式 */
+        .settings-group {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .settings-group .checkbox-group {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* 菜单样式 */
+        .menu-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .menu-button {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 14px 16px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+
+        .menu-button:hover {
+            background: #4b5563;
+        }
+
+        .menu-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            min-width: 180px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 8px;
+            z-index: 1000;
+            border: 1px solid #e5e7eb;
+            margin-top: 4px;
+        }
+
+        .menu-content.show {
+            display: block;
+        }
+
+        .menu-item {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: #374151;
+            font-size: 14px;
+            border: none;
+            background: none;
+            text-align: left;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .menu-item:hover {
+            background-color: #f9fafb;
+        }
+
+        .menu-item:first-child {
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        .menu-item:last-child {
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        /* 手风琴样式 */
+        .accordion {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .accordion-header {
+            background: #f9fafb;
+            padding: 16px;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+            text-align: left;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #374151;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .accordion-header:hover {
+            background: #f3f4f6;
+        }
+
+        .accordion-header:focus {
+            outline: none;
+            background: #f3f4f6;
+        }
+
+        .accordion-toggle {
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+
+        .accordion-content {
+            padding: 16px;
+            border-top: 1px solid #e5e7eb;
+            display: none;
+        }
+
+        .accordion.active .accordion-content {
+            display: block;
+        }
+
+        .accordion.active .accordion-toggle {
+            transform: rotate(180deg);
+        }
+
+        /* 固定顶栏样式 */
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+        }
+
+        .app-header h1 {
+            font-size: 1.1rem;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .header-left, .header-right {
+            flex: 1 0 0;
+        }
+
+        .header-right {
+            /* 空元素，用于布局平衡 */
+            flex: 1;
+        }
+
+        .header-center {
+            text-align: center;
+        }
+
+        /* 为主内容区添加上边距，防止被顶栏遮挡 */
+        .main-content {
+            padding-top: 72px;
+        }
+
+        /* 菜单按钮样式 */
+        .menu-button {
+            background: transparent;
+            border: none;
+            font-size: 1.75rem;
+            cursor: pointer;
+            padding: 8px;
+            color: #334155;
+            line-height: 1;
+        }
+
+        /* 下拉菜单样式 */
+        .header-left {
+            position: relative;
+        }
+
+        .main-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 180px;
+            padding: 8px 0;
+            overflow: hidden;
+        }
+
+        .main-menu.show {
+            display: block;
+        }
+
+        .main-menu a {
+            display: block;
+            padding: 12px 16px;
+            color: #334155;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        .main-menu a:hover {
+            background-color: #f1f5f9;
+        }
+
+        .main-menu a.menu-item-danger {
+            color: #dc2626;
+        }
+
+        /* 新的日期选择器样式 */
+        .date-range-trigger {
+            display: flex;
+            align-items: center;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: white;
+        }
+
+        .date-range-trigger:hover {
+            border-color: #3b82f6;
+        }
+
+        .date-display-box {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .date-display-box:first-child {
+            text-align: left;
+        }
+        .date-display-box:last-child {
+            text-align: right;
+        }
+
+        .date-value {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        .date-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        /* 未选择日期时的占位符样式 */
+        .date-value.placeholder {
+            color: #9ca3af;
+            font-weight: 400;
+        }
+
+        .date-display-separator {
+            font-size: 1.25rem;
+            color: #9ca3af;
+            margin: 0 12px;
+        }
+
+        /* 让 flatpickr 日历在移动端看起来更大、更具沉浸感 */
+        @media (max-width: 768px) {
+            .flatpickr-calendar {
+                width: 95vw !important; /* 占据大部分屏幕宽度 */
+                max-width: 100% !important;
+                /* 在移动端也确保z-index足够高 */
+                z-index: 3000 !important;
+            }
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            -webkit-animation-name: fadeIn;
+            -webkit-animation-duration: 0.4s;
+            animation-name: fadeIn;
+            animation-duration: 0.4s
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+            -webkit-animation-name: slideIn;
+            -webkit-animation-duration: 0.4s;
+            animation-name: slideIn;
+            animation-duration: 0.4s
+        }
+        
+        @-webkit-keyframes slideIn { from {bottom: -300px; opacity: 0} to {bottom: 0; opacity: 1} }
+        @keyframes slideIn { from {bottom: -300px; opacity: 0} to {bottom: 0; opacity: 1} }
+        @-webkit-keyframes fadeIn { from {opacity: 0} to {opacity: 1} }
+        @keyframes fadeIn { from {opacity: 0} to {opacity: 1} }
+
+        .modal-header {
+            padding: 2px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            color: #1e293b;
+        }
+
+        .modal-body {
+            padding: 16px;
+            font-size: 0.9rem;
+            color: #334155;
+        }
+
+        .modal-body ul {
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+
+        .close-button {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        /* 确保模态框内的日历正确显示 */
+        .modal-content .flatpickr-calendar {
+            position: absolute;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            background: white;
+            width: auto !important;
+            max-width: none !important;
+            min-width: 280px;
+        }
+
+        /* 移动端模态框内的日历优化 */
+        @media (max-width: 767px) {
+            .modal-content .flatpickr-calendar {
+                position: fixed;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                width: 90vw !important;
+                max-width: 350px;
+                z-index: 3001;
+                font-size: 14px;
+            }
+
+            .modal-content .flatpickr-calendar .flatpickr-day {
+                min-width: 32px;
+                height: 32px;
+                line-height: 32px;
+            }
+
+            .modal-content .flatpickr-calendar .flatpickr-month,
+            .modal-content .flatpickr-calendar .flatpickr-weekday {
+                font-size: 12px;
+            }
+        }
+
+/* 优化后的日期输入框样式 */
+#date-range-input {
+    background-color: white;
+    cursor: pointer;
+    text-align: center;
+    font-size: 1rem;
+    color: #1e293b;
+    font-weight: 500;
+}
+
+#date-range-input::placeholder {
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+/* 日期输入框样式 */
+#date-range-input {
+    width: 100%;
+    padding: 12px 16px;
+    background-color: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 1rem;
+    color: #1e293b;
+    font-weight: 500;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#date-range-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+#date-range-input:hover {
+    border-color: #cbd5e1;
+}
+
+#date-range-input::placeholder {
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+/* 日历modal样式 */
+.calendar-modal-content {
+    max-width: 95vw;
+    width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* 新的日历样式 */
+:root { --gap: 12px; --radius: 10px; --fg: #1f2937; --muted:#6b7280; --brand:#2563eb; --bg:#ffffff; --ring:#93c5fd; --hover:#f3f4f6; }
+.picker { max-width: 100%; margin: 0; background: var(--bg); border: none; border-radius: 16px; box-shadow: none; overflow: hidden; }
+
+.bar { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid #e5e7eb; gap:10px; flex-wrap:wrap; }
+.btn { display:inline-flex; align-items:center; justify-content:center; padding:8px 12px; border:1px solid #e5e7eb; background:#fff; border-radius: 8px; cursor:pointer; user-select:none; }
+.btn:hover{ background: var(--hover); }
+.btn.icon { width:36px; height:36px; padding:0; color: #374151; font-size: 16px; }
+.title {
+    font-weight: 700;
+    margin: 0 8px;
+    color: #1f2937;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+    user-select: none;
+}
+
+.title:hover {
+    background-color: #f3f4f6;
+}
+
+.title:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+.jump { margin-left:auto; display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.select { border:1px solid #e5e7eb; border-radius:8px; padding:8px 10px; background:#fff; cursor:pointer; color: #374151; font-weight: 500; }
+.yearbox { display:flex; align-items:center; gap:6px; }
+.yearval { min-width: 72px; text-align:center; padding:8px 10px; border:1px solid #e5e7eb; border-radius:8px; background:#fff; color: #374151; font-weight: 500; }
+
+.month { padding:12px; }
+.month-head { display:flex; align-items:center; justify-content:center; font-weight:600; margin-bottom: 8px; }
+
+.grid { width:100%; border-collapse: collapse; table-layout: fixed; }
+.grid th { font-size: 12px; font-weight: 600; color: var(--muted); padding: 6px 0; }
+.grid td { padding: 2px; height: 40px; }
+.day { width:100%; height:36px; border-radius: 8px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.day:hover { background: var(--hover); }
+.day.muted { color:#cbd5e1; cursor: default; }
+.day.muted:hover { background: transparent; }
+.day.start, .day.end { background: var(--brand); color:#fff; position:relative; z-index:1; }
+.day.in-range { background: #dbeafe; }
+
+.legend { padding: 12px; display:flex; gap:10px; color: var(--muted); border-top:1px solid #e5e7eb; align-items:center; justify-content: space-between; }
+.summary { font-weight: 600; color: var(--fg); }
+.footer { padding: 12px; border-top:1px solid #e5e7eb; display:flex; gap: 10px; justify-content:flex-end; }
+.btn.primary { background: var(--brand); color:#fff; border-color: transparent; }
+.btn.primary:disabled { opacity:.5; cursor: not-allowed; }
+
+/* 年月选择面板样式 */
+.year-month-selector {
+    background: #f8fafc;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 16px;
+    animation: slide-down 0.2s ease-out;
+}
+
+.ym-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.ym-title {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 16px;
+}
+
+.btn.icon.small {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.ym-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.year-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}
+
+.year-display {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    min-width: 80px;
+    text-align: center;
+}
+
+.month-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.month-btn {
+    padding: 12px 8px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    transition: all 0.2s ease;
+}
+
+.month-btn:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+.month-btn.active {
+    background: #3b82f6;
+    color: white;
+    border-color: #2563eb;
+}
+
+.month-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 年月选择面板动画 */
+@keyframes slide-down {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 清空按钮样式 */
+#clear {
+    background: #f3f4f6 !important;
+    color: #374151 !important;
+    border-color: #d1d5db !important;
+}
+
+/* Today按钮样式 */
+#todayBtn {
+    color: #374151 !important;
+    font-weight: 500 !important;
+    background: #fff !important;
+    border-color: #e5e7eb !important;
+}
+
+/* 确保所有按钮文字都清晰可见 */
+.btn {
+    color: #374151 !important;
+}
+
+/* 平板和桌面端优化 */
+@media (min-width: 768px) {
+  .calendar-modal-content {
+    max-width: 600px;
+    width: 90vw;
+  }
+  .picker { max-width: 560px; margin: 20px auto; }
+  .bar { padding: 16px 20px; }
+  .title { color: #1f2937; }
+  .btn.icon { color: #374151; }
+  .select, .yearval { color: #374151; }
+  #todayBtn { color: #374151 !important; }
+  .btn { color: #374151 !important; }
+  .month { padding: 16px; }
+  .legend, .footer { padding: 16px 20px; }
+}
+
+/* 手机端优化 */
+@media (max-width: 520px) {
+  .picker { margin: 0; }
+  .grid td { height: 36px; }
+  .day { height:32px; }
+  .bar { padding: 8px 12px; }
+  .title {
+      font-size: 14px;
+      color: #1f2937;
+      padding: 6px 8px;
+  }
+  .btn { padding: 6px 8px; font-size: 12px; }
+  .btn.icon { width: 32px; height: 32px; font-size: 14px; color: #374151; }
+  .select, .yearval { padding: 6px 8px; font-size: 12px; color: #374151; }
+  #todayBtn { color: #374151 !important; font-size: 12px; }
+  .btn { color: #374151 !important; }
+  .month { padding: 8px; }
+  .legend, .footer { padding: 8px 12px; }
+
+  /* 年月选择面板手机端优化 */
+  .year-month-selector { padding: 12px; }
+  .ym-header { margin-bottom: 12px; }
+  .ym-title { font-size: 14px; }
+  .btn.icon.small { width: 24px; height: 24px; font-size: 12px; }
+  .year-display { font-size: 16px; min-width: 70px; }
+  .month-btn { padding: 10px 6px; font-size: 13px; }
+  .month-grid { gap: 6px; }
+}
+
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-left">
+            <button id="menu-toggle" class="menu-button" aria-label="打开菜单">☰</button>
+            <nav id="main-menu" class="main-menu">
+                <a href="#" data-action="export">💾 导出数据</a>
+                <a href="#" data-action="import">📂 导入数据</a>
+                <a href="#" data-action="rules">ℹ️ 规则说明</a>
+                <a href="#" data-action="clear" class="menu-item-danger">🗑️ 清空所有</a>
+            </nav>
+        </div>
+        <div class="header-center">
+            <h1>申根停留计算器</h1>
+        </div>
+        <div class="header-right"></div>
+    </header>
+
+    <!-- 新增记录模态框 -->
+    <div id="addRecordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✈️ 添加停留记录</h2>
+                <span class="close-button" onclick="closeAddRecordModal()" ontouchend="event.preventDefault(); closeAddRecordModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="addRecord(event)">
+                    <div class="form-group">
+                        <label>🌍 国家 / 地区</label>
+                        <select id="country" required>
+                            <option value="">选择国家</option>
+                            <option value="China">🇨🇳 China 中国</option>
+                            <optgroup label="申根成员国">
+                                <option value="Austria">Austria 奥地利</option>
+                                <option value="Belgium">Belgium 比利时</option>
+                                <option value="Bulgaria">Bulgaria 保加利亚</option>
+                                <option value="Croatia">Croatia 克罗地亚</option>
+                                <option value="Czechia">Czechia 捷克</option>
+                                <option value="Denmark">Denmark 丹麦</option>
+                                <option value="Estonia">Estonia 爱沙尼亚</option>
+                                <option value="Finland">Finland 芬兰</option>
+                                <option value="France">France 法国</option>
+                                <option value="Germany">Germany 德国</option>
+                                <option value="Greece" selected>Greece 希腊</option>
+                                <option value="Hungary">Hungary 匈牙利</option>
+                                <option value="Iceland">Iceland 冰岛</option>
+                                <option value="Italy">Italy 意大利</option>
+                                <option value="Latvia">Latvia 拉脱维亚</option>
+                                <option value="Liechtenstein">Liechtenstein 列支敦士登</option>
+                                <option value="Lithuania">Lithuania 立陶宛</option>
+                                <option value="Luxembourg">Luxembourg 卢森堡</option>
+                                <option value="Malta">Malta 马耳他</option>
+                                <option value="Netherlands">Netherlands 荷兰</option>
+                                <option value="Norway">Norway 挪威</option>
+                                <option value="Poland">Poland 波兰</option>
+                                <option value="Portugal">Portugal 葡萄牙</option>
+                                <option value="Romania">Romania 罗马尼亚</option>
+                                <option value="Slovakia">Slovakia 斯洛伐克</option>
+                                <option value="Slovenia">Slovenia 斯洛文尼亚</option>
+                                <option value="Spain">Spain 西班牙</option>
+                                <option value="Sweden">Sweden 瑞典</option>
+                                <option value="Switzerland">Switzerland 瑞士</option>
+                            </optgroup>
+                            <optgroup label="其他地区">
+                                <option value="Monaco">Monaco 摩纳哥</option>
+                                <option value="San Marino">San Marino 圣马力诺</option>
+                                <option value="Vatican City">Vatican City 梵蒂冈</option>
+                                <option value="Andorra">Andorra 安道尔</option>
+                                <option value="Ireland">Ireland 爱尔兰</option>
+                                <option value="United Kingdom">United Kingdom 英国</option>
+                                <option value="Albania">Albania 阿尔巴尼亚</option>
+                                <option value="North Macedonia">North Macedonia 北马其顿</option>
+                                <option value="Serbia">Serbia 塞尔维亚</option>
+                                <option value="Türkiye">Türkiye 土耳其</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date-range-input">📅 出入境日期</label>
+                        <input type="text" id="date-range-input" placeholder="选择入境和出境日期" readonly required>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>📝 备注</label>
+                        <input type="text" id="notes" placeholder="例如：城市、航班号、同行人">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="secondary" onclick="closeAddRecordModal()">取消</button>
+                        <button type="submit" class="primary">✅ 添加记录</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载指示器 -->
+    <div id="loading-indicator" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">正在加载申根停留计算器...</div>
+        </div>
+    </div>
+
+
+    <div class="container main-content">
+        <!-- 标签页内容 -->
+        <div class="tab-content">
+            <!-- 计算器标签页 -->
+            <div id="calculator-tab" class="tab-panel active">
+                <!-- 控制日期 -->
+                <div class="card control-card">
+                    <div class="date-control">
+                        <label>📅 检查日期</label>
+                        <input type="date" id="controlDate" onchange="updateStats()">
+                    </div>
+                </div>
+
+                <!-- 核心统计数据 -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-content">
+                            <div class="stat-number primary" id="remainingDays">90</div>
+                            <div class="stat-label">剩余可用天数</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="usedDays">0</div>
+                            <div class="stat-label">过去180天已使用</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-content">
+                            <div class="stat-number success" id="maxContinuous">0天</div>
+                            <div class="stat-label">理论最大连续停留</div>
+                            <div class="stat-subtext" id="maxContinuousDate">截止日期：-</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="totalDays">0</div>
+                            <div class="stat-label">累计申根天数</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 国家统计排行 -->
+                <div class="card">
+                    <h3>📊 国家停留统计</h3>
+                    <div class="stats-grid">
+                        <div class="stat-section">
+                            <h4>⏰ 过去180天</h4>
+                            <div class="ranking-container">
+                                <div class="ranking-group">
+                                    <h5>申根国家</h5>
+                                    <div id="recentSchengenStats">
+                                        <p style="color: #6b7280; font-style: italic;">暂无数据</p>
+                                    </div>
+                                </div>
+                                <div class="ranking-group">
+                                    <h5>非申根国家</h5>
+                                    <div id="recentNonSchengenStats">
+                                        <p style="color: #6b7280; font-style: italic;">暂无数据</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-section">
+                            <h4>📊 全部时间</h4>
+                            <div class="ranking-container">
+                                <div class="ranking-group">
+                                    <h5>申根国家</h5>
+                                    <div id="allTimeSchengenStats">
+                                        <p style="color: #6b7280; font-style: italic;">暂无数据</p>
+                                    </div>
+                                </div>
+                                <div class="ranking-group">
+                                    <h5>非申根国家</h5>
+                                    <div id="allTimeNonSchengenStats">
+                                        <p style="color: #6b7280; font-style: italic;">暂无数据</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 特殊设置 -->
+                <div class="card">
+                    <h3>⚙️ 特殊设置</h3>
+                    <div class="settings-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="microstates" onchange="updateStats()">
+                            <label for="microstates">将摩纳哥/圣马力诺/梵蒂冈计入申根</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="andorra" onchange="updateStats()">
+                            <label for="andorra">将安道尔计入申根</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 旅程记录标签页 -->
+            <div id="records-tab" class="tab-panel">
+                <div class="card">
+                    <h3>📋 我的停留记录</h3>
+                    <div id="recordsContainer">
+                        <div class="empty-state">
+                            <div class="empty-icon">📝</div>
+                            <p>暂无记录</p>
+                            <p class="empty-subtitle">点击右下角的 + 按钮添加记录</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部标签栏 -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" data-tab="calculator-tab">
+            <div class="nav-icon">🧮</div>
+            <div class="nav-label">计算器</div>
+        </button>
+        <button class="nav-item" data-tab="records-tab">
+            <div class="nav-icon">📋</div>
+            <div class="nav-label">旅程记录</div>
+        </button>
+    </nav>
+
+    <!-- 悬浮操作按钮 -->
+    <button class="fab" onclick="openAddRecordModal()">
+        <span class="fab-icon">+</span>
+    </button>
+    
+    <div id="rulesModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>申根停留规则说明</h2>
+          <span class="close-button" onclick="hideRulesModal()" ontouchend="event.preventDefault(); hideRulesModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p><strong>核心规则：</strong>过去180天内，在所有申根国家累计停留不得超过90天</p>
+            <p><strong>计算方式：</strong></p>
+            <ul>
+                <li>采用滑动窗口计算：以检查日期为基准，向前追溯180天</li>
+                <li>包含入境当天和出境当天的停留天数</li>
+                <li>仅计算在申根国家的实际停留，不包括国际中转</li>
+            </ul>
+            <p><strong>申根国家范围：</strong></p>
+            <ul>
+                <li>26个正式申根成员国：奥地利、比利时、保加利亚、克罗地亚、捷克、丹麦、爱沙尼亚、芬兰、法国、德国、希腊、匈牙利、冰岛、意大利、拉脱维亚、列支敦士登、立陶宛、卢森堡、马耳他、荷兰、挪威、波兰、葡萄牙、罗马尼亚、斯洛伐克、斯洛文尼亚、西班牙、瑞典、瑞士</li>
+                <li>可选计入：摩纳哥、圣马力诺、梵蒂冈、安道尔</li>
+            </ul>
+            <p><strong>特殊情况：</strong></p>
+            <ul>
+                <li>国际机场中转（未入境）：不计入停留天数</li>
+                <li>跨国旅行：同一日期在多个申根国家停留只算一天</li>
+                <li>理论最大连续停留：基于当前历史记录计算的可连续停留天数</li>
+            </ul>
+            <p style="margin-top: 12px; font-style: italic;">
+                ⚠️ 本工具仅供参考，不构成法律建议。申根停留规则以欧盟官方为准。如有疑问，请咨询当地移民局或领事馆。
+            </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 日历选择器Modal -->
+    <div id="calendarModal" class="modal">
+      <div class="modal-content calendar-modal-content">
+        <div class="modal-header">
+          <h2>📅 选择出入境日期</h2>
+          <span class="close-button" onclick="closeCalendarModal()" ontouchend="event.preventDefault(); closeCalendarModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="picker" id="date-picker">
+            <div class="bar">
+              <button class="btn icon" id="prev" title="上一个月">◀</button>
+              <div class="title" id="month-year-title" tabindex="0" role="button" aria-live="polite" title="点击选择年月">
+                <span id="year-label">YYYY</span>年 <span id="month-label">MM</span>月
+              </div>
+              <button class="btn icon" id="next" title="下一个月">▶</button>
+              <button class="btn" id="todayBtn" title="回到本月">Today</button>
+            </div>
+
+            <!-- 年月选择面板 -->
+            <div class="year-month-selector" id="ym-selector" style="display: none;">
+              <div class="ym-header">
+                <span class="ym-title">选择年月</span>
+                <button class="btn icon small" id="close-ym-selector" title="关闭">×</button>
+              </div>
+              <div class="ym-content">
+                <div class="year-selector">
+                  <button class="btn icon" id="year-prev">◀</button>
+                  <span class="year-display" id="ym-year-display">2024</span>
+                  <button class="btn icon" id="year-next">▶</button>
+                </div>
+                <div class="month-grid" id="month-grid">
+                  <!-- 月份按钮将通过JavaScript动态生成 -->
+                </div>
+              </div>
+            </div>
+
+            <div class="month">
+              <div class="month-head" id="m-head"></div>
+              <table class="grid">
+                <thead><tr id="m-dow"></tr></thead>
+                <tbody id="m-body"></tbody>
+              </table>
+            </div>
+
+            <div class="legend">
+              <div class="summary" id="summary">选择入境与出境日期（支持选择过去日期）</div>
+              <div id="nights" class="muted"></div>
+            </div>
+
+            <div class="footer">
+              <button class="btn" id="clear" onclick="clearCalendarSelection()">清空</button>
+              <button class="btn primary" id="done" disabled onclick="confirmCalendarSelection()">完成</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+        // 申根国家生效日期
+        const SCHENGEN_START_BY_COUNTRY = {
+            Austria: "1900-01-01", Belgium: "1900-01-01", Bulgaria: "1900-01-01",
+            Croatia: "2023-01-01", Czechia: "1900-01-01", Denmark: "1900-01-01",
+            Estonia: "1900-01-01", Finland: "1900-01-01", France: "1900-01-01",
+            Germany: "1900-01-01", Greece: "1900-01-01", Hungary: "1900-01-01",
+            Iceland: "1900-01-01", Italy: "1900-01-01", Latvia: "1900-01-01",
+            Liechtenstein: "1900-01-01", Lithuania: "1900-01-01", Luxembourg: "1900-01-01",
+            Malta: "1900-01-01", Netherlands: "1900-01-01", Norway: "1900-01-01",
+            Poland: "1900-01-01", Portugal: "1900-01-01", Romania: "1900-01-01",
+            Slovakia: "1900-01-01", Slovenia: "1900-01-01", Spain: "1900-01-01",
+            Sweden: "1900-01-01", Switzerland: "1900-01-01"
+        };
+
+        let records = [];
+
+        // 工具函数
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function parseDate(dateStr) {
+            return new Date(dateStr + 'T00:00:00');
+        }
+
+        function addDays(dateStr, days) {
+            const date = parseDate(dateStr);
+            date.setDate(date.getDate() + days);
+            return formatDate(date);
+        }
+
+        function daysDiff(start, end) {
+            const startDate = parseDate(start);
+            const endDate = parseDate(end);
+            const diffTime = endDate - startDate;
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // 包含首尾两天
+        }
+
+        function todayStr() {
+            return formatDate(new Date());
+        }
+
+        function isSchengenOnDate(country, dateStr) {
+            const microstates = document.getElementById('microstates').checked;
+            const andorra = document.getElementById('andorra').checked;
+
+            if (country in SCHENGEN_START_BY_COUNTRY) {
+                return dateStr >= SCHENGEN_START_BY_COUNTRY[country];
+            }
+
+            if (['Monaco', 'San Marino', 'Vatican City'].includes(country)) {
+                return microstates;
+            }
+
+            if (country === 'Andorra') {
+                return andorra;
+            }
+
+            return false; // 其他国家不计入
+        }
+
+        // 计算最常用的国家（除中国外的前5名）
+        function getFrequentCountries() {
+            const countryCount = new Map();
+
+            // 统计除中国外的所有国家使用次数
+            records.forEach(record => {
+                if (record.country && record.country !== 'China') {
+                    countryCount.set(record.country, (countryCount.get(record.country) || 0) + 1);
+                }
+            });
+
+            // 按使用次数排序，返回前5名
+            return Array.from(countryCount.entries())
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5)
+                .map(([country]) => country);
+        }
+
+        // 更新国家选择器，添加常用国家选项组
+        function updateCountrySelector() {
+            const countrySelect = document.getElementById('country');
+            if (!countrySelect) return;
+
+            const frequentCountries = getFrequentCountries();
+            const originalHtml = countrySelect.innerHTML;
+
+            // 如果有常用国家，在中国之后、申根国家之前插入常用国家选项组
+            if (frequentCountries.length > 0) {
+                // 找到中国选项的位置
+                const chinaOptionIndex = originalHtml.indexOf('<option value="China">🇨🇳 China 中国</option>');
+                if (chinaOptionIndex !== -1) {
+                    const beforeChina = originalHtml.substring(0, chinaOptionIndex + '<option value="China">🇨🇳 China 中国</option>'.length);
+                    const afterChina = originalHtml.substring(chinaOptionIndex + '<option value="China">🇨🇳 China 中国</option>'.length);
+
+                    let frequentOptions = '<optgroup label="常用国家">\n';
+                    frequentCountries.forEach(country => {
+                        // 从原HTML中提取对应的选项
+                        const optionMatch = afterChina.match(new RegExp(`<option value="${country.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}">[^<]*</option>`));
+                        if (optionMatch) {
+                            frequentOptions += optionMatch[0] + '\n';
+                        }
+                    });
+                    frequentOptions += '</optgroup>\n';
+
+                    countrySelect.innerHTML = beforeChina + frequentOptions + afterChina;
+                }
+            } else {
+                countrySelect.innerHTML = originalHtml;
+            }
+        }
+
+        function generateDaySet() {
+            const days = new Set();
+            records.forEach(record => {
+                if (!record.entryDate || !record.exitDate) return;
+                if (record.exitDate < record.entryDate) return;
+
+                const totalDays = daysDiff(record.entryDate, record.exitDate);
+                for (let i = 0; i < totalDays; i++) {
+                    const day = addDays(record.entryDate, i);
+                    if (isSchengenOnDate(record.country, day)) {
+                        days.add(day);
+                    }
+                }
+            });
+            return days;
+        }
+
+        function countUsedInWindow(daySet, controlDate) {
+            const windowStart = addDays(controlDate, -179);
+            let count = 0;
+
+            for (let i = 0; i < 180; i++) {
+                const day = addDays(windowStart, i);
+                if (day > controlDate) break;
+                if (daySet.has(day)) count++;
+            }
+
+            return count;
+        }
+
+        // 计算全部时间各国停留天数
+        function getAllTimeCountryStats() {
+            const countryStats = new Map();
+
+            records.forEach(record => {
+                if (!record.entryDate || !record.exitDate) return;
+                if (record.exitDate < record.entryDate) return;
+
+                const totalDays = daysDiff(record.entryDate, record.exitDate);
+                let schengenDays = 0;
+                let totalStayDays = 0;
+
+                for (let i = 0; i < totalDays; i++) {
+                    const day = addDays(record.entryDate, i);
+                    totalStayDays++;
+                    if (isSchengenOnDate(record.country, day)) {
+                        schengenDays++;
+                    }
+                }
+
+                if (totalStayDays > 0) {
+                    const existing = countryStats.get(record.country) || { total: 0, schengen: 0 };
+                    countryStats.set(record.country, {
+                        total: existing.total + totalStayDays,
+                        schengen: existing.schengen + schengenDays
+                    });
+                }
+            });
+
+            return countryStats;
+        }
+
+        // 计算过去180天各国停留天数
+        function getCountryStatsInWindow(controlDate) {
+            const windowStart = addDays(controlDate, -179);
+            const countryStats = new Map();
+
+            records.forEach(record => {
+                if (!record.entryDate || !record.exitDate) return;
+                if (record.exitDate < record.entryDate) return;
+
+                const recordStart = record.entryDate > windowStart ? record.entryDate : windowStart;
+                const recordEnd = record.exitDate < controlDate ? record.exitDate : controlDate;
+
+                if (recordStart <= recordEnd) {
+                    const totalDays = daysDiff(recordStart, recordEnd);
+                    let schengenDays = 0;
+                    let totalStayDays = 0;
+
+                    for (let i = 0; i < totalDays; i++) {
+                        const day = addDays(recordStart, i);
+                        if (day > controlDate) break;
+                        totalStayDays++;
+                        if (isSchengenOnDate(record.country, day)) {
+                            schengenDays++;
+                        }
+                    }
+
+                    if (totalStayDays > 0) {
+                        const existing = countryStats.get(record.country) || { total: 0, schengen: 0 };
+                        countryStats.set(record.country, {
+                            total: existing.total + totalStayDays,
+                            schengen: existing.schengen + schengenDays
+                        });
+                    }
+                }
+            });
+
+            return countryStats;
+        }
+
+        // 计算理论最大连续停留天数（修正版算法）
+        function calculateMaxContinuousStay(controlDate) {
+            const daySet = generateDaySet(); // 历史已计入的申根日期集合
+            const start = controlDate; // 从控制日期开始计算
+            
+            let maxDays = 0;
+            let untilDate = start;
+
+            // 模拟未来从 start 开始的每一天都在申根
+            for (let futureDay = 0; futureDay <= 365; futureDay++) { // 安全上限给大一点
+                const checkDate = addDays(start, futureDay);
+                const windowStart = addDays(checkDate, -179);
+
+                // 计算 [windowStart .. checkDate] 里"已用的天数"
+                // 其中：历史上已经计入的天 + 未来从 start 到 checkDate 的假设天
+                let usedInWindow = 0;
+                for (let i = 0; i < 180; i++) {
+                    const d = addDays(windowStart, i);
+                    if (d > checkDate) break;
+
+                    // 未来段：d >= start && d <= checkDate，视为在申根
+                    if (d >= start && d <= checkDate) {
+                        usedInWindow++;
+                    } else if (daySet.has(d)) {
+                        usedInWindow++;
+                    }
+                }
+
+                // 规则：当天窗口累计 > 90 就超限；=90 仍然允许当天
+                if (usedInWindow > 90) break;
+
+                maxDays = futureDay; // 记录能到的最远天数（含当天）
+            }
+
+            // 如果 maxDays = 0，表示当日已经无法再多待（窗口已满 90）
+            untilDate = maxDays > 0 ? addDays(start, maxDays) : start;
+            
+            return { days: maxDays, untilDate };
+        }
+
+        function updateStats() {
+            try {
+                const controlDate = document.getElementById('controlDate').value || todayStr();
+            const daySet = generateDaySet();
+            const usedDays = countUsedInWindow(daySet, controlDate);
+            const remaining = Math.max(0, 90 - usedDays);
+            const totalDays = daySet.size;
+            const continuousStayResult = calculateMaxContinuousStay(controlDate);
+
+            document.getElementById('usedDays').textContent = usedDays;
+            document.getElementById('usedDays').className = 'stat-number primary';
+
+            document.getElementById('remainingDays').textContent = remaining;
+            document.getElementById('remainingDays').className = 'stat-number success';
+
+            // 显示连续停留天数和截止日期
+            const maxContinuousText = continuousStayResult.days > 0 ?
+                `${continuousStayResult.days}天` :
+                '0天';
+            document.getElementById('maxContinuous').textContent = maxContinuousText;
+            document.getElementById('maxContinuous').className = 'stat-number primary';
+
+            // 显示截止日期
+            const dateElement = document.getElementById('maxContinuousDate');
+            if (continuousStayResult.days > 0) {
+                dateElement.textContent = `截止日期：${continuousStayResult.untilDate}`;
+                dateElement.style.color = '#059669';
+            } else {
+                dateElement.textContent = '当前无法继续停留';
+                dateElement.style.color = '#dc2626'; // 红色
+            }
+
+            document.getElementById('totalDays').textContent = totalDays;
+
+                // 更新国家统计
+                renderCountryRankings();
+            } catch (error) {
+                console.error('更新统计失败:', error);
+            }
+        }
+
+
+        // 渲染国家排行榜
+        function renderCountryRankings() {
+            const allTimeStats = getAllTimeCountryStats();
+            const controlDate = document.getElementById('controlDate').value || todayStr();
+            const recentStats = getCountryStatsInWindow(controlDate);
+
+            // 渲染全部时间统计
+            renderRankingSection('allTimeSchengenStats', 'allTimeNonSchengenStats', allTimeStats, '全部时间');
+
+            // 渲染过去180天统计
+            renderRankingSection('recentSchengenStats', 'recentNonSchengenStats', recentStats, '过去180天');
+        }
+
+        // 渲染单个排行榜部分
+        function renderRankingSection(schengenContainerId, nonSchengenContainerId, countryStats, period) {
+            const schengenContainer = document.getElementById(schengenContainerId);
+            const nonSchengenContainer = document.getElementById(nonSchengenContainerId);
+
+            if (countryStats.size === 0) {
+                schengenContainer.innerHTML = `<p style="color: #6b7280; font-style: italic;">暂无数据</p>`;
+                nonSchengenContainer.innerHTML = `<p style="color: #6b7280; font-style: italic;">暂无数据</p>`;
+                return;
+            }
+
+            // 分离申根和非申根国家
+            const schengenStats = [];
+            const nonSchengenStats = [];
+            let totalSchengenDays = 0;
+            let totalNonSchengenDays = 0;
+
+            Array.from(countryStats.entries()).forEach(([country, stats]) => {
+                const isSchengenCountry = isSchengenOnDate(country, todayStr());
+                if (isSchengenCountry) {
+                    schengenStats.push({ country, ...stats });
+                    totalSchengenDays += stats.schengen;
+                } else {
+                    nonSchengenStats.push({ country, ...stats });
+                    totalNonSchengenDays += stats.total;
+                }
+            });
+
+            // 渲染申根国家
+            renderGroupSection(schengenContainer, schengenStats, totalSchengenDays, '申根');
+
+            // 渲染非申根国家
+            renderGroupSection(nonSchengenContainer, nonSchengenStats, totalNonSchengenDays, '非申根');
+        }
+
+        // 渲染分组部分
+        function renderGroupSection(container, stats, totalDays, groupType) {
+            if (stats.length === 0) {
+                container.innerHTML = `<p style="color: #6b7280; font-style: italic;">暂无数据</p>`;
+                return;
+            }
+
+            // 按申根天数排序（申根国家）或总天数排序（非申根国家）
+            const sortedStats = stats.sort((a, b) => {
+                if (groupType === '申根') {
+                    return b.schengen - a.schengen;
+                } else {
+                    return b.total - a.total;
+                }
+            }).slice(0, 10); // 只显示前10名
+
+            let html = '';
+            sortedStats.forEach((stat, index) => {
+                const rankClass = index < 5 ? `rank-${index + 1}` : '';
+
+                html += `
+                    <div class="country-ranking-item ${rankClass}">
+                        <div class="ranking-country">
+                            ${stat.country}
+                        </div>
+                        <div class="ranking-number">
+                            ${groupType === '申根' ? stat.schengen : stat.total}天
+                        </div>
+                    </div>
+                `;
+            });
+
+            // 添加总天数
+            html += `<div class="ranking-group-total">${groupType}总计：${totalDays}天</div>`;
+
+            container.innerHTML = html;
+        }
+
+        function renderRecords() {
+            try {
+                const container = document.getElementById('recordsContainer');
+
+                if (!container) {
+                    console.warn('recordsContainer元素不存在');
+                    return;
+                }
+
+                if (!Array.isArray(records)) {
+                    console.warn('records不是数组，重置为空数组');
+                    records = [];
+                }
+
+                if (records.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><p>暂无记录</p><p class="empty-subtitle">点击右下角的 + 按钮添加记录</p></div>';
+                    return;
+                }
+
+                // 按入境日期倒序排序（最新的在前面）
+                const sortedRecords = [...records].sort((a, b) => b.entryDate.localeCompare(a.entryDate));
+
+                let html = '<div class="records-list">';
+
+            sortedRecords.forEach((record, originalIndex) => {
+                const countedDays = countDaysForRecord(record);
+                // 找到原始索引用于删除功能
+                const actualIndex = records.findIndex(r => r === record);
+                const isSchengen = isSchengenOnDate(record.country, record.entryDate);
+
+                html += `
+                    <div class="record-item">
+                        <div class="record-header">
+                            <div class="record-country">
+                                <span class="country-name">${record.country}</span>
+                                ${isSchengen ? '<span class="schengen-badge">申根</span>' : '<span class="non-schengen-badge">非申根</span>'}
+                            </div>
+                            <div class="record-actions">
+                                <button data-index="${actualIndex}" class="delete-btn" title="删除记录">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                        <div class="record-details">
+                            <div class="record-dates">
+                                <span class="date-entry">📅 入境: ${record.entryDate}</span>
+                                <span class="date-separator">→</span>
+                                <span class="date-exit">📅 出境: ${record.exitDate}</span>
+                            </div>
+                            <div class="record-meta">
+                                <span class="days-counted">⏱️ 计入天数: ${countedDays}天</span>
+                            </div>
+                            ${record.notes ? `<div class="record-notes">📝 ${record.notes}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+                html += '</div>';
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('渲染记录失败:', error);
+                const container = document.getElementById('recordsContainer');
+                if (container) {
+                    container.innerHTML = '<div class="error-state"><p>⚠️ 加载记录时出错</p></div>';
+                }
+            }
+        }
+
+        function countDaysForRecord(record) {
+            if (!record.entryDate || !record.exitDate) return 0;
+            if (record.exitDate < record.entryDate) return 0;
+
+            let count = 0;
+            const totalDays = daysDiff(record.entryDate, record.exitDate);
+            for (let i = 0; i < totalDays; i++) {
+                const day = addDays(record.entryDate, i);
+                if (isSchengenOnDate(record.country, day)) {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        function addRecord(event) {
+            event.preventDefault();
+
+            const country = document.getElementById('country').value;
+            const notes = document.getElementById('notes').value;
+
+            // 从输入框获取选中的日期
+            const input = document.getElementById('date-range-input');
+            const dateValue = input.value.trim();
+
+            if (!dateValue || !dateValue.includes('→')) {
+                alert('请选择完整的出入境日期范围');
+                return;
+            }
+
+            const [entryDate, exitDate] = dateValue.split('→').map(d => d.trim());
+
+            if (!country || !entryDate || !exitDate) {
+                alert('请填写完整信息');
+                return;
+            }
+
+            if (exitDate < entryDate) {
+                alert('出境日期不能早于入境日期');
+                return;
+            }
+
+            records.push({ country, entryDate, exitDate, notes });
+            saveData();
+            renderRecords();
+            updateStats();
+            updateCountrySelector();
+
+            // 清空表单
+            document.getElementById('date-range-input').value = '';
+            document.getElementById('notes').value = '';
+        }
+
+        function deleteRecord(index) {
+            if (confirm('确定要删除这条记录吗？')) {
+                records.splice(index, 1);
+                saveData();
+                renderRecords();
+                updateStats();
+                updateCountrySelector();
+            }
+        }
+
+        function clearAll() {
+            if (confirm('确定要清空所有记录吗？此操作不可撤销。')) {
+                records = [];
+                saveData();
+                renderRecords();
+                updateStats();
+                updateCountrySelector();
+            }
+        }
+
+
+        // 手风琴切换功能
+        function toggleAccordion(accordionId) {
+            const accordion = document.getElementById(accordionId);
+            accordion.classList.toggle('active');
+        }
+
+        // *** START ANDROID BRIDGE FUNCTIONS ***
+
+        // 1. EXPORT: Called by the "Export" button.
+        function exportDataForAndroid() {
+            // Check if the Android JavaScript interface exists
+            if (typeof Android !== 'undefined' && Android.saveDataToFile) {
+                const data = {
+                    records,
+                    settings: {
+                        microstates: document.getElementById('microstates').checked,
+                        andorra: document.getElementById('andorra').checked
+                    }
+                };
+                const jsonString = JSON.stringify(data, null, 2);
+                const fileName = `schengen_stays_${todayStr()}.json`;
+
+                // Call the native Android function to save the file
+                Android.saveDataToFile(fileName, jsonString);
+            } else {
+                // Fallback for browsers - use standard download
+                exportDataForBrowser();
+            }
+        }
+
+        // Browser-based export function
+        function exportDataForBrowser() {
+            const data = {
+                records,
+                settings: {
+                    microstates: document.getElementById('microstates').checked,
+                    andorra: document.getElementById('andorra').checked
+                }
+            };
+            const jsonString = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `schengen_stays_${todayStr()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            alert('数据导出成功！');
+        }
+
+        // 2. IMPORT: Called by the "Import" button.
+        function importDataForAndroid() {
+             // Check if the Android JavaScript interface exists
+            if (typeof Android !== 'undefined' && Android.openFilePicker) {
+                // Call the native Android function to open the file picker
+                Android.openFilePicker();
+            } else {
+                 // Fallback for browsers - use file input
+                importDataForBrowser();
+            }
+        }
+
+        // Browser-based import function
+        function importDataForBrowser() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const data = JSON.parse(e.target.result);
+                            if (data.records && Array.isArray(data.records)) {
+                                records = data.records;
+                                if (data.settings) {
+                                    document.getElementById('microstates').checked = !!data.settings.microstates;
+                                    document.getElementById('andorra').checked = !!data.settings.andorra;
+                                }
+                                saveData();
+                                renderRecords();
+                                updateStats();
+                                updateCountrySelector();
+                                alert('数据导入成功！');
+                            } else {
+                                alert('导入失败：JSON文件格式不正确');
+                            }
+                        } catch (err) {
+                            alert('导入失败：不是有效的JSON文件');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        // 3. IMPORT HANDLER: This function is CALLED FROM your native Android code.
+        // After the user selects a file, the native code reads it and passes the content to this function.
+        function handleImportedData(base64String) {
+            if (!base64String) {
+                alert('导入失败：未收到文件内容');
+                return;
+            }
+            try {
+                // 使用atob()函数对Base64字符串进行解码
+                const jsonString = decodeURIComponent(escape(window.atob(base64String)));
+
+                // 解析解码后的JSON字符串
+                const data = JSON.parse(jsonString);
+
+                if (data.records && Array.isArray(data.records)) {
+                    records = data.records;
+                    if (data.settings) {
+                        document.getElementById('microstates').checked = !!data.settings.microstates;
+                        document.getElementById('andorra').checked = !!data.settings.andorra;
+                    }
+                    saveData();
+                    renderRecords();
+                    updateStats();
+                    updateCountrySelector();
+                    alert('数据导入成功！');
+                } else {
+                    alert('导入失败：JSON文件格式不正确');
+                }
+            } catch (err) {
+                console.error('导入失败:', err);
+                alert('导入失败：无法解析文件。请确保文件是有效的JSON格式。');
+            }
+        }
+
+        // *** END ANDROID BRIDGE FUNCTIONS ***
+        
+        // --- Modal Functions ---
+        function showRulesModal() {
+            document.getElementById('rulesModal').style.display = 'block';
+        }
+
+        function hideRulesModal() {
+            document.getElementById('rulesModal').style.display = 'none';
+        }
+
+        // --- 新增记录模态框 Functions ---
+        function openAddRecordModal() {
+            document.getElementById('addRecordModal').style.display = 'block';
+
+            // 重置表单的其他项
+            document.getElementById('country').value = 'Greece'; // 可以设置一个默认国家
+            document.getElementById('notes').value = '';
+
+            // 设置默认日期区间
+            const input = document.getElementById('date-range-input');
+            let defaultDates = [];
+            const today = todayStr();
+
+            if (records.length > 0) {
+                // 找到所有记录中最近的出境日期
+                const latestRecord = [...records].sort((a, b) => b.exitDate.localeCompare(a.exitDate))[0];
+                const lastExitDate = latestRecord.exitDate;
+
+                // 如果最近出境日期在今天或今天之前，则默认选择[最近出境日期, 今天]
+                if (parseDate(lastExitDate) <= parseDate(today)) {
+                    defaultDates = [lastExitDate, today];
+                } else {
+                    // 如果最近出境日期在未来（例如预填写的未来行程），则默认只选择今天
+                    defaultDates = [today];
+                }
+            } else {
+                // 如果没有任何记录，则默认只选择今天
+                defaultDates = [today];
+            }
+
+            // 设置输入框的默认值
+            if (defaultDates.length === 2) {
+                input.value = `${defaultDates[0]} → ${defaultDates[1]}`;
+            } else if (defaultDates.length === 1) {
+                input.value = defaultDates[0];
+            }
+
+            // 为输入框添加点击事件监听器
+            input.addEventListener('click', openCalendarModal);
+            input.addEventListener('focus', openCalendarModal);
+            input.addEventListener('touchend', function(event) {
+                event.preventDefault();
+                openCalendarModal();
+            });
+        }
+
+        function closeAddRecordModal() {
+            document.getElementById('addRecordModal').style.display = 'none';
+        }
+
+        // --- 标签页切换 Functions ---
+        function switchTab(tabId) {
+            // 隐藏所有标签页
+            const tabPanels = document.querySelectorAll('.tab-panel');
+            tabPanels.forEach(panel => {
+                panel.classList.remove('active');
+            });
+
+            // 移除所有导航项的激活状态
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // 显示选中的标签页
+            const targetTab = document.getElementById(tabId);
+            if (targetTab) {
+                targetTab.classList.add('active');
+            }
+
+            // 激活对应的导航项
+            const targetNav = document.querySelector(`[data-tab="${tabId}"]`);
+            if (targetNav) {
+                targetNav.classList.add('active');
+            }
+
+            // 保存当前标签页状态
+            localStorage.setItem('activeTab', tabId);
+        }
+
+        function initTabNavigation() {
+            const navItems = document.querySelectorAll('.nav-item');
+
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+        }
+
+        function loadActiveTab() {
+            const savedTab = localStorage.getItem('activeTab') || 'calculator-tab';
+            switchTab(savedTab);
+        }
+
+
+        function saveData() {
+            localStorage.setItem('schengen-records', JSON.stringify(records));
+            localStorage.setItem('schengen-settings', JSON.stringify({
+                microstates: document.getElementById('microstates').checked,
+                andorra: document.getElementById('andorra').checked
+            }));
+        }
+
+        function loadData() {
+            try {
+                // 检查localStorage是否可用
+                if (typeof Storage === "undefined") {
+                    console.warn('localStorage不可用，使用默认设置');
+                    return;
+                }
+
+                const savedRecords = localStorage.getItem('schengen-records');
+                if (savedRecords) {
+                    try {
+                        records = JSON.parse(savedRecords);
+                        // 验证数据结构
+                        if (!Array.isArray(records)) {
+                            console.warn('记录数据格式错误，重置为空数组');
+                            records = [];
+                        }
+                    } catch (parseError) {
+                        console.error('解析记录数据失败:', parseError);
+                        records = [];
+                    }
+                }
+
+                const savedSettings = localStorage.getItem('schengen-settings');
+                if (savedSettings) {
+                    try {
+                        const settings = JSON.parse(savedSettings);
+                        // 安全地设置复选框状态
+                        const microstatesCheckbox = document.getElementById('microstates');
+                        const andorraCheckbox = document.getElementById('andorra');
+
+                        if (microstatesCheckbox) {
+                            microstatesCheckbox.checked = !!settings.microstates;
+                        }
+                        if (andorraCheckbox) {
+                            andorraCheckbox.checked = !!settings.andorra;
+                        }
+                    } catch (parseError) {
+                        console.error('解析设置数据失败:', parseError);
+                    }
+                }
+            } catch (e) {
+                console.error('加载数据失败:', e);
+                // 重置为默认状态
+                records = [];
+            }
+        }
+
+        // ===== 新的日历状态变量
+        let view = new Date();
+        view.setDate(1);
+        let start = null, end = null;
+
+        // ===== DOM 元素
+        let prevBtn, nextBtn, clearBtn, doneBtn, summary, todayBtn, nodes, DOW, MONTHS;
+        let ymSelector, ymYearDisplay, monthGrid, closeYmBtn, yearPrevBtn, yearNextBtn, monthYearTitle, yearLabel, monthLabel;
+
+        // ===== 工具函数
+        const pad = n => (n < 10 ? "0" : "") + n;
+        const sameDate = (a, b) => a && b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+        const fmt = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+        const daysInMonth = (y, m) => new Date(y, m + 1, 0).getDate();
+        const startOfMonth = d => new Date(d.getFullYear(), d.getMonth(), 1);
+
+        // ===== 初始化新的日历
+        function initDateRangePicker() {
+            try {
+                // 获取DOM元素
+                prevBtn = document.getElementById('prev');
+                nextBtn = document.getElementById('next');
+                clearBtn = document.getElementById('clear');
+                doneBtn = document.getElementById('done');
+                summary = document.getElementById('summary');
+                todayBtn = document.getElementById('todayBtn');
+
+                // 新的年月选择相关元素
+                ymSelector = document.getElementById('ym-selector');
+                ymYearDisplay = document.getElementById('ym-year-display');
+                monthGrid = document.getElementById('month-grid');
+                closeYmBtn = document.getElementById('close-ym-selector');
+                yearPrevBtn = document.getElementById('year-prev');
+                yearNextBtn = document.getElementById('year-next');
+                monthYearTitle = document.getElementById('month-year-title');
+                yearLabel = document.getElementById('year-label');
+                monthLabel = document.getElementById('month-label');
+
+                nodes = {
+                    head: document.getElementById('m-head'),
+                    dow: document.getElementById('m-dow'),
+                    body: document.getElementById('m-body')
+                };
+
+                DOW = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+                MONTHS = Array.from({ length: 12 }, (_, i) => new Date(2000, i, 1).toLocaleString(undefined, { month: 'long' }));
+
+                // 设置事件监听器
+                setupEventListeners();
+
+                // 生成月份按钮
+                generateMonthButtons();
+
+                // 初始渲染
+                render();
+
+                console.log('新日历初始化成功');
+                return { start, end };
+            } catch (error) {
+                console.error('初始化新日历失败:', error);
+                return null;
+            }
+        }
+
+        // ===== 点击输入框打开日历modal
+        function openCalendarModal() {
+            // 重置日历状态
+            start = null;
+            end = null;
+            render();
+
+            // 显示modal
+            document.getElementById('calendarModal').style.display = 'block';
+        }
+
+        // ===== 关闭日历modal
+        function closeCalendarModal() {
+            document.getElementById('calendarModal').style.display = 'none';
+        }
+
+        // ===== 清空日历选择
+        function clearCalendarSelection() {
+            start = null;
+            end = null;
+            render();
+        }
+
+        // ===== 确认日历选择
+        function confirmCalendarSelection() {
+            if (start && end) {
+                const entryDate = formatDate(start);
+                const exitDate = formatDate(end);
+                const input = document.getElementById('date-range-input');
+                input.value = `${entryDate} → ${exitDate}`;
+
+                // 关闭modal
+                closeCalendarModal();
+            }
+        }
+
+        // ===== 生成月份按钮
+        function generateMonthButtons() {
+            const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月',
+                               '7月', '8月', '9月', '10月', '11月', '12月'];
+
+            monthGrid.innerHTML = '';
+            monthNames.forEach((monthName, index) => {
+                const button = document.createElement('button');
+                button.className = 'month-btn';
+                button.textContent = monthName;
+                button.dataset.month = index;
+
+                button.addEventListener('click', () => {
+                    selectMonth(index);
+                });
+
+                monthGrid.appendChild(button);
+            });
+        }
+
+        // ===== 选择月份
+        function selectMonth(monthIndex) {
+            const selectedYear = parseInt(ymYearDisplay.textContent);
+            view = new Date(selectedYear, monthIndex, 1);
+            hideYearMonthSelector();
+            render();
+        }
+
+        // ===== 显示年月选择器
+        function showYearMonthSelector() {
+            ymSelector.style.display = 'block';
+            ymYearDisplay.textContent = view.getFullYear();
+            updateMonthButtons();
+        }
+
+        // ===== 隐藏年月选择器
+        function hideYearMonthSelector() {
+            ymSelector.style.display = 'none';
+        }
+
+        // ===== 更新月份按钮状态
+        function updateMonthButtons() {
+            const buttons = monthGrid.querySelectorAll('.month-btn');
+            const currentYear = view.getFullYear();
+            const currentMonth = view.getMonth();
+
+            buttons.forEach((button, index) => {
+                button.classList.remove('active');
+                if (currentYear === new Date().getFullYear() && index === currentMonth) {
+                    button.classList.add('active');
+                }
+            });
+        }
+
+        // ===== 设置事件监听器
+        function setupEventListeners() {
+            // 月份导航
+            prevBtn.addEventListener('click', () => {
+                view = new Date(view.getFullYear(), view.getMonth() - 1, 1);
+                render();
+            });
+            nextBtn.addEventListener('click', () => {
+                view = new Date(view.getFullYear(), view.getMonth() + 1, 1);
+                render();
+            });
+
+            // 清空和完成按钮
+            clearBtn.addEventListener('click', () => {
+                start = null;
+                end = null;
+                render();
+            });
+
+            doneBtn.addEventListener('click', () => {
+                if (!(start && end)) return;
+                console.log('选择的日期范围:', { start: fmt(start), end: fmt(end) });
+                // 这里可以添加保存逻辑
+            });
+
+            // 年月标题点击事件
+            monthYearTitle.addEventListener('click', () => {
+                if (ymSelector.style.display === 'none' || ymSelector.style.display === '') {
+                    showYearMonthSelector();
+                } else {
+                    hideYearMonthSelector();
+                }
+            });
+
+            // 年月选择器关闭按钮
+            closeYmBtn.addEventListener('click', () => {
+                hideYearMonthSelector();
+            });
+
+            // 年份导航
+            yearPrevBtn.addEventListener('click', () => {
+                const currentYear = parseInt(ymYearDisplay.textContent);
+                ymYearDisplay.textContent = currentYear - 1;
+                updateMonthButtons();
+            });
+
+            yearNextBtn.addEventListener('click', () => {
+                const currentYear = parseInt(ymYearDisplay.textContent);
+                ymYearDisplay.textContent = currentYear + 1;
+                updateMonthButtons();
+            });
+
+            // Today按钮
+            todayBtn.addEventListener('click', () => {
+                const now = new Date();
+                view = new Date(now.getFullYear(), now.getMonth(), 1);
+                hideYearMonthSelector();
+                render();
+            });
+
+            // 日期选择
+            document.getElementById('date-picker').addEventListener('click', (e) => {
+                const div = e.target.closest('.day');
+                if (div && div.dataset.date) {
+                    const [Y, M, D] = div.dataset.date.split('-').map(Number);
+                    const d = new Date(Y, M - 1, D);
+                    if (!start || (start && end)) {
+                        start = d;
+                        end = null;
+                    } else if (d < start) {
+                        end = start;
+                        start = d;
+                    } else if (d.getTime() === start.getTime()) {
+                        start = d;
+                        end = d;
+                    } else {
+                        end = d;
+                    }
+                    render();
+                }
+            });
+        }
+
+        // ===== 渲染函数
+        function render() {
+            // 更新年月标题
+            if (yearLabel && monthLabel) {
+                yearLabel.textContent = view.getFullYear();
+                monthLabel.textContent = String(view.getMonth() + 1).padStart(2, '0');
+            }
+
+            buildMonth(nodes, view);
+            updateSummary();
+        }
+
+        // ===== 构建月份视图
+        function buildMonth(nodes, date) {
+            nodes.head.textContent = date.toLocaleString(undefined, { month: 'long', year: 'numeric' });
+            nodes.dow.innerHTML = DOW.map(s => `<th>${s}</th>`).join('');
+
+            const y = date.getFullYear(), m = date.getMonth();
+            const first = startOfMonth(date);
+            const weekday = (first.getDay() + 6) % 7; // Monday-first
+            const total = weekday + daysInMonth(y, m);
+            const rows = Math.ceil(total / 7);
+
+            let html = '';
+            let day = 1;
+            for (let r = 0; r < rows; r++) {
+                html += '<tr>';
+                for (let c = 0; c < 7; c++) {
+                    const cellIndex = r * 7 + c;
+                    if (cellIndex < weekday) {
+                        html += '<td></td>';
+                        continue;
+                    }
+                    if (day > daysInMonth(y, m)) {
+                        html += '<td></td>';
+                        continue;
+                    }
+                    const d = new Date(y, m, day);
+                    const cls = classesForDay(d);
+                    html += `<td><div class="day ${cls}" data-date="${fmt(d)}">${day}</div></td>`;
+                    day++;
+                }
+                html += '</tr>';
+            }
+            nodes.body.innerHTML = html;
+        }
+
+        // ===== 日期样式计算
+        function classesForDay(d) {
+            if (start && !end) {
+                if (sameDate(d, start)) return 'start';
+                if (d > start) return 'in-range';
+                return '';
+            }
+            if (start && end) {
+                if (sameDate(d, start)) return 'start';
+                if (sameDate(d, end)) return 'end';
+                if (d > start && d < end) return 'in-range';
+            }
+            return '';
+        }
+
+        // ===== 更新摘要
+        function updateSummary() {
+            const nightsElement = document.getElementById('nights');
+
+            if (start && end) {
+                const nights = Math.max((end - start) / (1000 * 60 * 60 * 24), 0);
+                const days = nights + 1; // 改为天数：夜数+1
+                summary.textContent = `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
+                if (nightsElement) {
+                    nightsElement.textContent = `共${days}天`;
+                }
+                doneBtn.disabled = false;
+            } else if (start) {
+                summary.textContent = `入境：${start.toLocaleDateString()} — 请选择出境`;
+                if (nightsElement) {
+                    nightsElement.textContent = '';
+                }
+                doneBtn.disabled = true;
+            } else {
+                summary.textContent = '选择入境与出境日期（支持选择过去日期）';
+                if (nightsElement) {
+                    nightsElement.textContent = '';
+                }
+                doneBtn.disabled = true;
+            }
+        }
+
+
+        // 延迟初始化函数
+        function delayedInit() {
+            try {
+                // 隐藏加载指示器
+                const loadingIndicator = document.getElementById('loading-indicator');
+                if (loadingIndicator) {
+                    loadingIndicator.classList.add('hidden');
+                }
+
+                // 安全地初始化各个组件
+                safeInit();
+            } catch (error) {
+                console.error('初始化失败:', error);
+                // 即使出错也要隐藏加载指示器
+                const loadingIndicator = document.getElementById('loading-indicator');
+                if (loadingIndicator) {
+                    loadingIndicator.classList.add('hidden');
+                }
+            }
+        }
+
+        // 安全的初始化函数
+        function safeInit() {
+            // 设置控制日期
+            const controlDateInput = document.getElementById('controlDate');
+            if (controlDateInput) {
+                controlDateInput.value = todayStr();
+            }
+
+            // 初始化新的日历
+            try {
+                initDateRangePicker();
+            } catch (error) {
+                console.error('初始化日期选择器失败:', error);
+            }
+
+            // 加载数据
+            loadData();
+
+            // 渲染界面
+            renderRecords();
+            updateStats();
+            renderCountryRankings();
+            updateCountrySelector();
+
+            // 为删除记录添加事件监听器 (事件委托)
+            const recordsContainer = document.getElementById('recordsContainer');
+            if (recordsContainer) {
+                // PC端使用click事件
+                recordsContainer.addEventListener('click', function(event) {
+                    handleDeleteClick(event);
+                });
+
+                // 移动端使用touchend事件
+                recordsContainer.addEventListener('touchend', function(event) {
+                    handleDeleteClick(event);
+                });
+            }
+
+            function handleDeleteClick(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                console.log('删除事件触发:', event.target, event.type);
+
+                // 查找被点击元素最近的 class 为 'delete-btn' 的祖先元素
+                const deleteButton = event.target.closest('.delete-btn');
+                console.log('找到的删除按钮:', deleteButton);
+
+                if (deleteButton) {
+                    // 从 data-index 属性获取索引
+                    const index = parseInt(deleteButton.dataset.index, 10);
+                    console.log('删除索引:', index);
+                    if (!isNaN(index)) {
+                        deleteRecord(index);
+                        console.log('调用deleteRecord函数成功');
+                    }
+                }
+            }
+
+            // 初始化标签页导航
+            initTabNavigation();
+            loadActiveTab();
+
+            // 菜单交互逻辑
+            const menuToggle = document.getElementById('menu-toggle');
+            const mainMenu = document.getElementById('main-menu');
+
+            if (menuToggle && mainMenu) {
+                // 为移动端添加触摸事件支持
+                const handleMenuToggle = function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    mainMenu.classList.toggle('show');
+                };
+
+                // 添加多种事件类型以支持不同设备
+                menuToggle.addEventListener('click', handleMenuToggle);
+                menuToggle.addEventListener('touchend', handleMenuToggle);
+
+                // 菜单项点击处理
+                const handleMenuItemClick = function(event) {
+                    const menuItem = event.target.closest('a');
+                    if (menuItem) {
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        const action = menuItem.dataset.action;
+                        switch (action) {
+                            case 'export':
+                                exportDataForAndroid();
+                                break;
+                            case 'import':
+                                importDataForAndroid();
+                                break;
+                            case 'rules':
+                                showRulesModal();
+                                break;
+                            case 'clear':
+                                clearAll();
+                                break;
+                        }
+
+                        // 点击菜单项后关闭菜单
+                        mainMenu.classList.remove('show');
+                    }
+                };
+
+                mainMenu.addEventListener('click', handleMenuItemClick);
+                mainMenu.addEventListener('touchend', handleMenuItemClick);
+            }
+
+            // 点击页面其他地方关闭菜单和模态框
+            const handleWindowClick = function(event) {
+                if (mainMenu && mainMenu.classList.contains('show')) {
+                    mainMenu.classList.remove('show');
+                }
+                // Close modal if user clicks outside of it
+                const rulesModal = document.getElementById('rulesModal');
+                const addRecordModal = document.getElementById('addRecordModal');
+                const calendarModal = document.getElementById('calendarModal');
+
+                if (event.target == rulesModal) {
+                    hideRulesModal();
+                }
+                if (event.target == addRecordModal) {
+                    closeAddRecordModal();
+                }
+                if (event.target == calendarModal) {
+                    closeCalendarModal();
+                }
+            };
+
+            // 为移动端添加触摸事件支持
+            window.addEventListener('click', handleWindowClick);
+            window.addEventListener('touchend', handleWindowClick);
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 延迟执行初始化，给WebView更多时间准备
+            setTimeout(delayedInit, 100);
+        });
+
+        // 额外确保在页面完全加载后也能初始化
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const loadingIndicator = document.getElementById('loading-indicator');
+                if (loadingIndicator && !loadingIndicator.classList.contains('hidden')) {
+                    delayedInit();
+                }
+            }, 500);
+        });
+
+    </script>
+</body>
+</html>

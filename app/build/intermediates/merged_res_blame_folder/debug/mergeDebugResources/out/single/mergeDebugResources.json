@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "com.example.schengenapp-debug-36:/drawable_ic_launcher.png.flat",
+        "source": "com.example.schengenapp-main-38:/drawable/ic_launcher.png"
+    },
+    {
+        "merged": "com.example.schengenapp-debug-36:/layout_activity_main.xml.flat",
+        "source": "com.example.schengenapp-main-38:/layout/activity_main.xml"
+    }
+]
