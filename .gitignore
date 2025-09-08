@@ -1,0 +1,22 @@
+# Gradle
+.gradle/
+build/
+**/build/
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+
+# Artifacts
+*.apk
+*.aab
+*.dex
+*.jar
+*.keystore
+
+# Local configs
+local.properties
+
+# Node / web（若有）
+node_modules/
+dist/

@@ -6,14 +6,16 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.webkit.WebSettings
 import android.webkit.JavascriptInterface
+import android.webkit.WebChromeClient
+import android.webkit.JsResult
 import android.content.Context
 import android.app.Activity
 import android.content.Intent
 import android.util.Base64
 import java.io.File
 import java.nio.charset.StandardCharsets
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-
 class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
@@ -79,7 +81,38 @@ class MainActivity : AppCompatActivity() {
                 return false
             }
         }
-        
+                // 设置WebChromeClient以支持 JavaScript 的 alert/confirm 弹窗
+        webView.webChromeClient = object : WebChromeClient() {
+            override fun onJsAlert(
+                view: WebView?,
+                url: String?,
+                message: String?,
+                result: JsResult
+            ): Boolean {
+                AlertDialog.Builder(this@MainActivity)
+                    .setMessage(message)
+                    .setPositiveButton(android.R.string.ok) { _, _ -> result.confirm() }
+                    .setCancelable(false)
+                    .create()
+                    .show()
+                return true
+            }
+
+            override fun onJsConfirm(
+                view: WebView?,
+                url: String?,
+                message: String?,
+                result: JsResult
+            ): Boolean {
+                AlertDialog.Builder(this@MainActivity)
+                    .setMessage(message)
+                    .setPositiveButton(android.R.string.ok) { _, _ -> result.confirm() }
+                    .setNegativeButton(android.R.string.cancel) { _, _ -> result.cancel() }
+                    .create()
+                    .show()
+                return true
+            }
+        }
         // 加载本地HTML文件
         webView.loadUrl("file:///android_asset/index.html")
     }
